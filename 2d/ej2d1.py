@@ -18,7 +18,7 @@ Esta actividad te enseñará a utilizar el sistema de registro de Flask,
 una habilidad crucial para el desarrollo y depuración de aplicaciones web.
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, Response
 
 def create_app():
     """
@@ -37,7 +37,8 @@ def create_app():
         # Implementa este endpoint:
         # 1. Registra un mensaje de nivel INFO usando app.logger.info()
         # 2. Devuelve un mensaje en texto plano indicando que se ha registrado el mensaje
-        pass
+        app.logger.info("INFO: Message logged")
+        return Response("INFO message logged", mimetype='text/plain')
 
     @app.route('/warning', methods=['GET'])
     def log_warning():
@@ -47,7 +48,8 @@ def create_app():
         # Implementa este endpoint:
         # 1. Registra un mensaje de nivel WARNING usando app.logger.warning()
         # 2. Devuelve un mensaje en texto plano indicando que se ha registrado el mensaje
-        pass
+        app.logger.warning("WARNING: Message logged")
+        return Response("WARNING message logged", mimetype='text/plain')
 
     @app.route('/error', methods=['GET'])
     def log_error():
@@ -57,7 +59,8 @@ def create_app():
         # Implementa este endpoint:
         # 1. Registra un mensaje de nivel ERROR usando app.logger.error()
         # 2. Devuelve un mensaje en texto plano indicando que se ha registrado el mensaje
-        pass
+        app.logger.error("ERROR: Message logged")
+        return Response("ERROR message logged", mimetype='text/plain')
 
     @app.route('/critical', methods=['GET'])
     def log_critical():
@@ -67,7 +70,8 @@ def create_app():
         # Implementa este endpoint:
         # 1. Registra un mensaje de nivel CRITICAL usando app.logger.critical()
         # 2. Devuelve un mensaje en texto plano indicando que se ha registrado el mensaje
-        pass
+        app.logger.critical("CRITICAL: Message logged")
+        return Response("CRITICAL message logged", mimetype='text/plain')
 
     @app.route('/status', methods=['GET'])
     def status():
@@ -77,7 +81,16 @@ def create_app():
         """
         # Este endpoint es opcional, puedes implementarlo si quieres practicar
         # con parámetros de consulta y logging condicional
-        pass
+        level = request.args.get('level', 'info')
+        if level == 'warning':
+            app.logger.warning(f"WARNING: Status check")
+            return Response("Warning logged", mimetype='text/plain')
+        elif level == 'error':
+            app.logger.error(f"ERROR: Status check")
+            return Response("Error logged", mimetype='text/plain')
+        else:
+            app.logger.info(f"INFO: Status check")
+            return Response("Info logged", mimetype='text/plain')
 
     return app
 

@@ -51,7 +51,9 @@ def create_app():
         Devuelve un texto plano con el tipo MIME `text/plain`
         """
         # Implementa este endpoint para devolver el contenido solicitado
-        pass
+        response = make_response("Este es un texto plano")
+        response.headers['Content-Type'] = 'text/plain'
+        return response
 
     @app.route('/html', methods=['GET'])
     def get_html():
@@ -59,7 +61,9 @@ def create_app():
         Devuelve un fragmento HTML con el tipo MIME `text/html`
         """
         # Implementa este endpoint para devolver el contenido solicitado
-        pass
+        response = make_response("<h1>Este es un fragmento HTML</h1>")
+        response.headers['Content-Type'] = 'text/html'
+        return response
 
     @app.route('/json', methods=['GET'])
     def get_json():
@@ -67,7 +71,7 @@ def create_app():
         Devuelve un objeto JSON con el tipo MIME `application/json`
         """
         # Implementa este endpoint para devolver el contenido solicitado
-        pass
+        return jsonify({"mensaje": "Este es un objeto JSON"})
 
     @app.route('/xml', methods=['GET'])
     def get_xml():
@@ -75,7 +79,9 @@ def create_app():
         Devuelve un documento XML con el tipo MIME `application/xml`
         """
         # Implementa este endpoint para devolver el contenido solicitado
-        pass
+        response = make_response("<mensaje>Este es un documento XML</mensaje>")
+        response.headers['Content-Type'] = 'application/xml'
+        return response
 
     @app.route('/image', methods=['GET'])
     def get_image():
@@ -84,7 +90,15 @@ def create_app():
         """
         # Implementa este endpoint para devolver el contenido solicitado
         # Sugerencia: Puedes usar send_file para enviar una imagen
-        pass
+        # Crear una imagen simple en memoria usando PIL
+        from PIL import Image
+        import io
+        
+        img = Image.new('RGB', (100, 100), color='red')
+        img_io = io.BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        return send_file(img_io, mimetype='image/png')
 
     @app.route('/binary', methods=['GET'])
     def get_binary():
@@ -94,7 +108,12 @@ def create_app():
         """
         # Implementa este endpoint para devolver el contenido solicitado
         # Sugerencia: Puedes usar os.urandom() para generar datos aleatorios
-        pass
+        binary_data = os.urandom(1024)
+        return Response(
+            binary_data,
+            mimetype='application/octet-stream',
+            headers={'Content-Disposition': 'attachment; filename=binary.bin'}
+        )
 
     return app
 

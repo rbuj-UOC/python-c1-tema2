@@ -47,7 +47,32 @@ class ProductAPIHandler(BaseHTTPRequestHandler):
         # 3. Busca el producto en la lista
         # 4. Si el producto existe, devuélvelo en formato JSON con código 200
         # 5. Si el producto no existe, devuelve un mensaje de error con código 404
-        pass
+        match = re.match(r'^/product/(\d+)$', self.path)
+        
+        if match:
+            product_id = int(match.group(1))
+            # Buscar el producto
+            product = None
+            for p in products:
+                if p["id"] == product_id:
+                    product = p
+                    break
+            
+            if product:
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(product).encode())
+            else:
+                self.send_response(404)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Product not found"}).encode())
+        else:
+            self.send_response(404)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Not Found"}).encode())
 
 def create_server(host="localhost", port=8000):
     """

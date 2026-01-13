@@ -21,6 +21,26 @@ def create_app():
     app = Flask(__name__)
 
     # Aquí debes implementar los endpoints solicitados
+    @app.route('/hello', methods=['GET'])
+    def hello():
+        """
+        Devuelve un mensaje de saludo
+        """
+        return "¡Hola mundo!"
+
+    @app.route('/goodbye', methods=['GET'])
+    def goodbye():
+        """
+        Devuelve un mensaje de despedida
+        """
+        return "¡Adiós mundo!"
+
+    @app.route('/greet/<nombre>', methods=['GET'])
+    def greet(nombre):
+        """
+        Devuelve un mensaje personalizado con el nombre proporcionado
+        """
+        return f"¡Hola, {nombre}!"
 
     return app
 

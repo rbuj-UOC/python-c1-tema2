@@ -34,7 +34,7 @@ Esta actividad te enseñará cómo recibir y manejar diferentes tipos de datos e
 una habilidad esencial para desarrollar APIs web que interactúan con diversos clientes.
 """
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, make_response
 import os
 
 def create_app():
@@ -56,7 +56,11 @@ def create_app():
         # 1. Verifica que el Content-Type sea text/plain
         # 2. Lee el contenido de la solicitud usando request.data
         # 3. Devuelve el mismo texto con Content-Type text/plain
-        pass
+        if request.content_type and 'text/plain' in request.content_type:
+            response = make_response(request.data)
+            response.headers['Content-Type'] = 'text/plain'
+            return response
+        return Response("Invalid content type", status=400)
 
     @app.route('/html', methods=['POST'])
     def post_html():
@@ -67,7 +71,11 @@ def create_app():
         # 1. Verifica que el Content-Type sea text/html
         # 2. Lee el contenido de la solicitud
         # 3. Devuelve el mismo HTML con Content-Type text/html
-        pass
+        if request.content_type and 'text/html' in request.content_type:
+            response = make_response(request.data)
+            response.headers['Content-Type'] = 'text/html'
+            return response
+        return Response("Invalid content type", status=400)
 
     @app.route('/json', methods=['POST'])
     def post_json():
@@ -77,7 +85,8 @@ def create_app():
         # Implementa este endpoint:
         # 1. Accede al contenido JSON usando request.get_json()
         # 2. Devuelve el mismo objeto JSON usando jsonify()
-        pass
+        data = request.get_json()
+        return jsonify(data)
 
     @app.route('/xml', methods=['POST'])
     def post_xml():
@@ -88,7 +97,11 @@ def create_app():
         # 1. Verifica que el Content-Type sea application/xml
         # 2. Lee el contenido XML de la solicitud
         # 3. Devuelve el mismo XML con Content-Type application/xml
-        pass
+        if request.content_type and 'application/xml' in request.content_type:
+            response = make_response(request.data)
+            response.headers['Content-Type'] = 'application/xml'
+            return response
+        return Response("Invalid content type", status=400)
 
     @app.route('/image', methods=['POST'])
     def post_image():
@@ -100,7 +113,13 @@ def create_app():
         # 2. Lee los datos binarios de la imagen
         # 3. Guarda la imagen en el directorio 'uploads' con un nombre único
         # 4. Devuelve una confirmación con el nombre del archivo guardado
-        pass
+        if request.content_type and ('image/png' in request.content_type or 'image/jpeg' in request.content_type):
+            archivo = f"image_{os.urandom(4).hex()}.{'png' if 'png' in request.content_type else 'jpg'}"
+            filepath = os.path.join(uploads_dir, archivo)
+            with open(filepath, 'wb') as f:
+                f.write(request.data)
+            return jsonify({"archivo": archivo, "mensaje": "Imagen guardada"}), 200
+        return jsonify({"error": "Invalid content type"}), 400
 
     @app.route('/binary', methods=['POST'])
     def post_binary():
@@ -112,7 +131,14 @@ def create_app():
         # 2. Lee los datos binarios de la solicitud
         # 3. Guarda los datos en un archivo o simplemente verifica su tamaño
         # 4. Devuelve una confirmación con información sobre los datos recibidos
-        pass
+        if request.content_type and 'application/octet-stream' in request.content_type:
+            data = request.data
+            archivo = f"binary_{os.urandom(4).hex()}.bin"
+            filepath = os.path.join(uploads_dir, archivo)
+            with open(filepath, 'wb') as f:
+                f.write(data)
+            return jsonify({"archivo": archivo, "tamaño": len(data), "mensaje": "Datos guardados"}), 200
+        return jsonify({"error": "Invalid content type"}), 400
 
     return app
 

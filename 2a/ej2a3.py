@@ -67,7 +67,37 @@ class ProductAPIHandler(BaseHTTPRequestHandler):
         #    a. Convierte el producto a XML usando dict_to_xml y prettify
         #    b. Devuelve el XML con código 200 y Content-Type application/xml
         # 5. Si el producto no existe, devuelve un mensaje de error XML con código 404
-        pass
+        match = re.match(r'^/product/(\d+)$', self.path)
+        
+        if match:
+            product_id = int(match.group(1))
+            # Buscar el producto
+            product = None
+            for p in products:
+                if p["id"] == product_id:
+                    product = p
+                    break
+            
+            if product:
+                self.send_response(200)
+                self.send_header("Content-type", "application/xml")
+                self.end_headers()
+                xml_elem = dict_to_xml("product", product)
+                self.wfile.write(prettify(xml_elem))
+            else:
+                self.send_response(404)
+                self.send_header("Content-type", "application/xml")
+                self.end_headers()
+                error_elem = ET.Element("error")
+                error_elem.text = "Product not found"
+                self.wfile.write(prettify(error_elem))
+        else:
+            self.send_response(404)
+            self.send_header("Content-type", "application/xml")
+            self.end_headers()
+            error_elem = ET.Element("error")
+            error_elem.text = "Not Found"
+            self.wfile.write(prettify(error_elem))
 
 def create_server(host="localhost", port=8000):
     """

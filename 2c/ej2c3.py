@@ -41,7 +41,7 @@ products = [
     {"id": 5, "name": "Ergonomic Chair", "price": 189.99, "category": "furniture"},
     {"id": 6, "name": "Coffee Maker Pro", "price": 89.99, "category": "appliances"},
     {"id": 7, "name": "Wireless Headphones", "price": 129.99, "category": "electronics"},
-    {"id": 8, "name": "Smart Watch", "price": 199.99, "category": "electronics"}
+    {"id": 8, "name": "Smart Watch", "price": 199.99, "category": "accessories"}
 ]
 
 def create_app():
@@ -64,7 +64,31 @@ def create_app():
         # 1. Obtén los parámetros de consulta usando request.args
         # 2. Filtra la lista de productos según los parámetros proporcionados
         # 3. Devuelve la lista filtrada en formato JSON con código 200
-        pass
+        result = products[:]
+        
+        # Filtrar por categoría
+        category = request.args.get('category')
+        if category:
+            result = [p for p in result if p['category'] == category]
+        
+        # Filtrar por precio mínimo
+        min_price = request.args.get('min_price')
+        if min_price:
+            min_price = float(min_price)
+            result = [p for p in result if p['price'] >= min_price]
+        
+        # Filtrar por precio máximo
+        max_price = request.args.get('max_price')
+        if max_price:
+            max_price = float(max_price)
+            result = [p for p in result if p['price'] <= max_price]
+        
+        # Filtrar por nombre (búsqueda parcial)
+        name = request.args.get('name')
+        if name:
+            result = [p for p in result if name.lower() in p['name'].lower()]
+        
+        return jsonify(result)
 
     return app
 
